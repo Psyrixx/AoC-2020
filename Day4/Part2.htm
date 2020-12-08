@@ -1,0 +1,124 @@
+<html>
+    <body>
+        <input type="file" id="file-input" />
+        <h3>Contents of the file:</h3>
+        <pre id="file-content"></pre>
+    </body>
+    
+    <script language="javascript">
+        function main(passportData) {
+            var validPassports = 0
+
+            passportData.forEach(passport => {
+                var reqsMet = 0
+                var cleansedData = cleanseData(passport)
+                const requirements = [
+                    'byr',  // (Birth Year)
+                    'iyr',  // (Issue Year)
+                    'eyr',  // (Expiration Year)
+                    'hgt',  // (Height)
+                    'hcl',  // (Hair Color)
+                    'ecl',  // (Eye Color)
+                    'pid'   // (Passport ID)
+                    // 'cid' (Country ID) is ignored
+                ]
+
+                cleansedData.forEach(item => {
+                    requirements.forEach(req => {
+                        if (item.startsWith(req)) {
+                            var validItem = validateData(item.trim())
+
+                            if (validItem) {
+                                reqsMet++
+                            }
+                        }
+                    })
+                })
+
+                if (reqsMet >= 7) {
+                    validPassports++
+                }
+            })
+
+            console.log("Number of Valid Passports: " + validPassports)
+        }
+
+        function cleanseData(passport) {
+            return passport.replace(/\n/g, ' ').split(' ')
+        }
+
+        function validateData(item) {
+            var dataIsValid = false
+            var items = item.split(':')
+
+            switch(items[0]) {
+                case 'byr':
+                    if (items[1] >= 1920 && items[1] <= 2002) {
+                        dataIsValid = true
+                    }
+                    break
+                case 'iyr':
+                    if (items[1] >= 2010 && items[1] <= 2020) {
+                        dataIsValid = true
+                    }
+                    break
+                case 'eyr':
+                    if (items[1] >= 2020 && items[1] <= 2030) {
+                        dataIsValid = true
+                    }
+                    break
+                case 'pid':
+                    if (items[1].length == 9) {
+                        dataIsValid = true
+                    }
+                    break
+                case 'ecl':
+                    if (items[1] == 'amb' || items[1] == 'blu' || items[1] == 'brn' || items[1] == 'gry' || items[1] == 'grn' || items[1] == 'hzl' || items[1] == 'oth') {
+                        dataIsValid = true
+                    }
+                    break
+                case 'hcl':
+                    dataIsValid = /^#[0-9A-F]{6}$/i.test(items[1])
+                    break
+                case 'hgt':
+                    if (items[1].includes('cm')) {
+                        var hgt = items[1].replace('cm', '')
+                        if (hgt >= 150 && hgt <= 193) {
+                            dataIsValid = true
+                        }
+                    } else if (items[1].includes('in')) {
+                        var hgt = items[1].replace('in', '')
+                        if (hgt >= 59 && hgt <= 76) {
+                            dataIsValid = true
+                        }
+                    }
+                default:
+                    break
+            }
+
+            return dataIsValid
+        }
+    
+        function readSingleFile(e) {
+            var file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function(e) {
+            var contents = e.target.result;
+            
+            main(loadData(contents))
+        };
+            reader.readAsText(file);
+        }
+        
+        function loadData(contents) {
+            console.log("Data Blocks: " + contents.length)
+            return contents.split('\n\r')
+        }
+        
+        document.getElementById('file-input')
+        .addEventListener('change', readSingleFile, false);
+    </script>
+</html>

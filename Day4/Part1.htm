@@ -1,0 +1,78 @@
+<html>
+    <body>
+        <input type="file" id="file-input" />
+        <h3>Contents of the file:</h3>
+        <pre id="file-content"></pre>
+    </body>
+    
+    <script language="javascript">
+        /*
+        byr (Birth Year)
+        iyr (Issue Year)
+        eyr (Expiration Year)
+        hgt (Height)
+        hcl (Hair Color)
+        ecl (Eye Color)
+        pid (Passport ID)
+        cid (Country ID)
+        */
+
+        function main(passportData) {
+            var validPassports = 0
+
+            passportData.forEach(passport => {
+                var reqsMet = 0
+                var cleansedData = cleanseData(passport)
+                const requirements = [
+                    'byr',
+                    'iyr',
+                    'eyr',
+                    'hgt',
+                    'hcl',
+                    'ecl',
+                    'pid'
+                ]
+
+                cleansedData.forEach(item => {
+                    requirements.forEach(req => {
+                        if (item.startsWith(req)) {
+                            reqsMet++
+                        }
+                    })
+                })
+
+                if (reqsMet >= 7) {
+                    validPassports++
+                }
+            })
+
+            console.log("Number of Valid Passports: " + validPassports)
+        }
+
+        function cleanseData(passport) {
+            return passport.replace(/\n/g, ' ').split(' ')
+        }
+    
+        function readSingleFile(e) {
+            var file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function(e) {
+            var contents = e.target.result;
+            
+            main(loadData(contents))
+        };
+            reader.readAsText(file);
+        }
+        
+        function loadData(contents) {
+            console.log("Data Blocks: " + contents.length)
+            return contents.split('\n\r')
+        }
+        
+        document.getElementById('file-input')
+        .addEventListener('change', readSingleFile, false);
+    </script>
+</html>

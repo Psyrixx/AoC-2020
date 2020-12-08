@@ -1,0 +1,73 @@
+<html>
+    <body>
+        <input type="file" id="file-input" />
+        <h3>Contents of the file:</h3>
+        <pre id="file-content"></pre>
+      </body>
+    
+      <script language="javascript">
+        function main(treeArray) {
+            var treeCount = calculateForSlope(1,1,treeArray) * calculateForSlope(3,1,treeArray) * calculateForSlope(5,1,treeArray) * calculateForSlope(7,1,treeArray) * calculateForSlope(1,2,treeArray)
+        
+            console.log("Trees encountered: ", treeCount)
+        }
+
+        function calculateForSlope(right, down, treeArray) {
+            var treeCount = 0
+            var place = 0
+            var row = 0
+
+            treeArray.forEach(element => {
+                if (down > 1 && row % down != 0) {
+                    row++
+                    return
+                }
+
+                var str = ""
+
+                if (place > 30) {
+                    place = place - 31
+                }
+
+                for (i = 0; i < 31; i++) {
+                    if (i == place) {
+                        if (element[i] == "#") {
+                            str = str + "X"
+                            treeCount++
+                        } else {
+                            str = str + "O"
+                        }
+                    } else {
+                        str = str + element[i]
+                    }
+                }
+
+                place += right
+                row++
+            });
+
+            return treeCount
+        }
+    
+        function readSingleFile(e) {
+          var file = e.target.files[0];
+          if (!file) {
+            return;
+          }
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var contents = e.target.result;
+            
+            main(loadData(contents))
+          };
+          reader.readAsText(file);
+        }
+        
+        function loadData(contents) {
+          return contents.split('\n')
+        }
+        
+        document.getElementById('file-input')
+          .addEventListener('change', readSingleFile, false);
+    </script>
+</html>

@@ -1,0 +1,51 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <input type="file" id="file-input" />
+    <h3>Contents of the file:</h3>
+    <pre id="file-content"></pre>
+  </body>
+
+  <script language="javascript">
+    function main(passwordArray) {
+      var numValidPasswords = 0
+
+      passwordArray.forEach(element => {
+        var password = element.split(": ")
+        var policy = password[0].split(" ")
+        var minmax = policy[0].split("-")
+        var char = policy[1]
+        var numchars = password[1].split(char).length - 1
+
+        if(numchars >= minmax[0] && numchars <= minmax[1]) {
+          numValidPasswords++
+        }
+      });
+
+      console.log("Valid number of passwords: ", numValidPasswords)
+    }
+
+    function readSingleFile(e) {
+      var file = e.target.files[0];
+      if (!file) {
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var contents = e.target.result;
+        
+        main(loadData(contents))
+      };
+      reader.readAsText(file);
+    }
+    
+    function loadData(contents) {
+      return contents.split('\n')
+    }
+    
+    document.getElementById('file-input')
+      .addEventListener('change', readSingleFile, false);
+    
+    </script>
+</html>
